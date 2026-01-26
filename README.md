@@ -74,7 +74,7 @@ python main.py --file <verified.rs> --id <id>
 **Example:** 
 
 ```
-python main.py --verified example/task_id_240.rs --id task_id_240
+python main.py --verified examples/task_id_240.rs --id task_id_240
 ```
 
 **Output:**
