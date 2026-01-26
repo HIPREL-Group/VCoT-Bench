@@ -14,11 +14,11 @@
 
 - 📊 Multi-dimension Evaluation: Evaluates formal verification capability along three dimensions: *Ratio*, *Type*, and *Location*.
 
-- 1️⃣ **Ratio**: Evaluates an LLM’s ability to recover missing verification steps under varying degrees of information loss.
+- 📈 **Ratio**: Evaluates an LLM’s ability to recover missing verification steps under varying degrees of information loss.
 
-- 2️⃣ **Type**: Evaluates an LLM’s ability to reconstruct specific proof types.
+- 🌟 **Type**: Evaluates an LLM’s ability to reconstruct specific proof types.
 
-- 3️⃣ **Location**: Evaluates how the position of missing reasoning affects a model’s ability to recover the underlying logic.
+- 📍 **Location**: Evaluates how the position of missing reasoning affects a model’s ability to recover the underlying logic.
 
 ### VCoT-Lift
 
@@ -42,12 +42,12 @@ You can configure the models used at different stages. By default, Gemini 3 is u
 ### Installation
 
 ```
-# Clone repository
+# 1. Clone repository
 
-# Install Python dependencies  
+# 2. Install Python dependencies  
 pip install -r requirements.txt
 
-# Set API keys based on your model selection
+# 3. Set up API keys based on your model selection
 export OPENAI_API_KEY=<your-openai-api-key> # default
 export GEMINI_API_KEY=<your-gemini-api-key> # default
 export ANTHROPIC_API_KEY=<your-anthropic-api-key>
@@ -69,12 +69,12 @@ python main.py --file <verified.rs> --id <id>
 **Key Parameters:**
 
 - `--file`: A Verus-verified Rust program file start proof lifting.
-- `--id` (optional): Result directory id for the transformation. Default: time slot id.
+- `--id` (optional): Result directory id for the lifting process. Default: time slot id.
 
 **Example:** 
 
 ```
-python main.py --verified examples/task_id_240.rs --id task_id_240
+python main.py --verified example/task_id_240.rs --id task_id_240
 ```
 
 **Output:**
