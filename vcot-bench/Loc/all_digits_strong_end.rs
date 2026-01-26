@@ -1,0 +1,118 @@
+use vstd::prelude::*;
+
+fn main() {}
+verus! {
+
+spec fn is_ascii_digit_spec(c: char) -> bool {
+    c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7'
+        || c == '8' || c == '9'
+}
+
+fn is_ascii_digit(c: char) -> (r: bool)
+    ensures
+        r == is_ascii_digit_spec(c),
+{
+    c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7'
+        || c == '8' || c == '9'
+}
+
+spec fn all_digits_spec(s: Seq<char>) -> bool {
+    forall|i: nat| #![auto] i < s.len() ==> is_ascii_digit_spec(s[i as int])
+}
+
+proof fn lemma_all_digits_false_from_counterexample(s: Seq<char>, wit: nat)
+    requires
+        wit < s.len(),
+        !is_ascii_digit_spec(s[wit as int]),
+    ensures
+        !all_digits_spec(s),
+{
+    assert(!all_digits_spec(s)) by {
+        assert(!(forall|i: nat| i < s.len() ==> is_ascii_digit_spec(s[i as int]))) by {
+            assert(!(wit < s.len() ==> is_ascii_digit_spec(s[wit as int])));
+        }
+    }
+}
+
+proof fn lemma_all_digits_subrange_step(s: Seq<char>, i: nat)
+    requires
+        i < s.len(),
+        all_digits_spec(s.subrange(0, i as int)),
+        is_ascii_digit_spec(s[i as int]),
+    ensures
+        all_digits_spec(s.subrange(0, (i + 1) as int)),
+{
+    assert forall|j: nat|
+        j < s.subrange(0, (i + 1) as int).len() implies is_ascii_digit_spec(#[trigger] s.subrange(0, (i + 1) as int)[j as int]) by
+    {
+        let t = s.subrange(0, (i + 1) as int);
+        assert(t.len() == i + 1);
+        assert forall|j: nat| j < t.len() implies is_ascii_digit_spec(t[j as int]) by {
+            if j < i {
+                let u = s.subrange(0, i as int);
+                assert(u.len() == i);
+                assert(t[j as int] == s[j as int]);
+                assert(u[j as int] == s[j as int]);
+                assert(is_ascii_digit_spec(u[j as int]));
+            } else {
+                assert(j == i);
+                assert(t[j as int] == s[i as int]);
+                assert(is_ascii_digit_spec(s[i as int]));
+            }
+        }
+    };
+}
+
+proof fn lemma_all_digits_spec_holds_for_empty_prefix(s: Seq<char>)
+    ensures
+        all_digits_spec(s.subrange(0, 0)),
+{
+    assert forall|j: nat|
+        j < s.subrange(0, 0).len() implies is_ascii_digit_spec(#[trigger] s.subrange(0, 0)[j as int]) by {
+        assert(j < 0);
+    };
+}
+
+#[verifier::exec_allows_no_decreases_clause]
+fn all_digits(s: String) -> (result: bool)
+    requires
+        s.is_ascii(),
+    ensures
+        all_digits_spec(s@) == result,
+{
+    let mut result = true;
+    let mut i = 0;
+
+    proof {
+        lemma_all_digits_spec_holds_for_empty_prefix(s@);
+        assert(all_digits_spec(s@.subrange(0, i as int)));
+    }
+
+    while i < s.as_str().unicode_len()
+        invariant
+            0 <= i <= s@.len(),
+            all_digits_spec(s@.subrange(0, i as int)),
+    {
+        let c = s.as_str().get_char(i);
+
+        assert(s@[i as int] == c);
+
+        if !is_ascii_digit(c) {
+            proof {
+                assert(!is_ascii_digit_spec(c));
+                assert(!is_ascii_digit_spec(s@[i as int]));
+                lemma_all_digits_false_from_counterexample(s@, i as nat);
+            }
+            return false;
+        }
+
+        // Fill in a block of assertions here to complete the proof
+
+        i = i + 1;
+    }
+
+    // Fill in a block of assertions here to complete the proof
+    true
+}
+
+} // verus!

@@ -1,0 +1,86 @@
+use vstd::prelude::*;
+
+fn main() {
+}
+
+verus! {
+
+// Complete the lemma function below
+proof fn lemma_min_preserved_or_updated(
+    old_min: i32,
+    new_min: i32,
+    x: i32,
+)
+   
+
+// Complete the lemma function below
+proof fn lemma_forall_extend_min(
+    nums: &Vec<i32>,
+    idx: int,
+    old_min: i32,
+    new_min: i32
+)
+   
+
+// Complete the lemma function below
+proof fn lemma_exists_extend_min(
+    nums: &Vec<i32>,
+    idx: int,
+    old_min: i32,
+    new_min: i32
+)
+   
+
+#[verifier::exec_allows_no_decreases_clause]
+fn smallest_num(nums: &Vec<i32>) -> (min: i32)
+    requires
+        nums.len() > 0,
+    ensures
+        forall|i: int| 0 <= i < nums.len() ==> min <= nums[i],
+        exists|i: int| 0 <= i < nums.len() && min == nums[i],
+{
+    let mut min = nums[0];
+    let mut index = 1;
+
+    while index < nums.len()
+        invariant
+            0 <= index <= nums.len(),
+            forall|k: int| 0 <= k < index ==> min <= nums[k],
+            exists|k: int| 0 <= k < index && min == nums[k],
+    {
+        let old_min = min;
+
+        if nums[index] < min {
+            min = nums[index];
+        }
+
+        assert(min == old_min || min == nums[(index as int)]) by {
+            if nums[(index as int)] < old_min {
+                assert(min == nums[(index as int)]);
+            } else {
+                assert(min == old_min);
+            }
+        };
+        assert(nums[(index as int)] < old_min ==> min == nums[(index as int)]) by {
+            if nums[(index as int)] < old_min {
+                assert(min == nums[(index as int)]);
+            }
+        };
+        assert(!(nums[(index as int)] < old_min) ==> min == old_min) by {
+            if !(nums[(index as int)] < old_min) {
+                assert(min == old_min);
+            }
+        };
+
+        proof {
+            lemma_forall_extend_min(nums, (index as int), old_min, min);
+            lemma_exists_extend_min(nums, (index as int), old_min, min);
+        }
+
+        index += 1;
+    }
+
+    min
+}
+
+}

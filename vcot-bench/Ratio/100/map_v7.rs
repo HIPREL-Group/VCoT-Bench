@@ -1,0 +1,52 @@
+use vstd::prelude::*;
+fn main() {}
+verus!{
+
+// Complete the lemma function below
+proof fn lemma_i32_add_4_no_overflow(v: i32)
+   
+
+// Complete the lemma function below
+proof fn lemma_forall_extend_by_one<T>(
+    s: Seq<T>,
+    i: int,
+    p: spec_fn(int) -> bool,
+)
+   
+
+// Complete the lemma function below
+proof fn lemma_shift_lower_segment<T>(
+    i: int,
+    xlen: int,
+    p: spec_fn(int) -> bool,
+)
+   
+
+#[verifier::exec_allows_no_decreases_clause]
+pub fn myfun2(x: &mut Vec<i32>) 
+requires 
+    forall |k:int| 0 <= k < old(x).len() ==> old(x)[k] <= 0x7FFF_FFFB,
+ensures 
+    x@.len() == old(x)@.len(),
+    forall |k:int| 0 <= k < x.len() ==> #[trigger] x@[k] == old(x)@[k] + 4,
+{
+    let mut i: usize = 0;
+    let xlen: usize = x.len();
+
+    while (i < xlen) 
+        // Fill in loop invariants here
+    { 
+        let temp = x[i];
+
+        // Fill in a block of assertions here to complete the proof
+
+        x.set(i, temp + 4);
+
+        // Fill in a block of assertions here to complete the proof
+
+        i = i + 1;
+    }  
+
+    // Fill in a block of assertions here to complete the proof
+}
+}

@@ -1,0 +1,148 @@
+use vstd::prelude::*;
+
+fn main() {
+}
+
+verus! {
+
+proof fn lemma_forall_prefix_preserved<T>(
+    s: Seq<T>,
+    key: T,
+    i: int,
+    j: int,
+)
+    requires
+        0 <= i <= j,
+        forall|m: int| 0 <= m < j ==> s[m] != key,
+    ensures
+        forall|m: int| 0 <= m < i ==> s[m] != key,
+{
+    assert forall|m: int| 0 <= m < i implies s[m] != key by {
+        assert(0 <= m < j) by {
+            assert(m < i);
+            assert(i <= j);
+        }
+    }
+}
+
+proof fn lemma_forall_prefix_extend<T>(
+    s: Seq<T>,
+    key: T,
+    i: int,
+)
+    requires
+        0 <= i,
+        forall|m: int| 0 <= m < i ==> s[m] != key,
+        s[i] != key,
+    ensures
+        forall|m: int| 0 <= m < i + 1 ==> s[m] != key,
+{
+    assert forall|m: int| 0 <= m < i + 1 implies s[m] != key by {
+        if m < i {
+            assert(s[m] != key);
+        } else {
+            assert(m == i) by {
+                assert(m < i + 1);
+                assert(!(m < i));
+            };
+            assert(s[m] != key);
+        }
+    }
+}
+
+proof fn lemma_seq_contains_from_exec_contains(arr: &Vec<i32>, key: i32)
+    ensures
+        (exists|i: int| 0 <= i < arr.len() && arr[i] == key) <==> arr@.contains(key),
+{
+    if exists|i: int| 0 <= i < arr.len() && arr[i] == key {
+        assert(arr@.contains(key)) by {
+            let w = choose|i: int| 0 <= i < arr.len() && arr[i] == key;
+            assert(0 <= w < arr.len());
+            assert(arr[w] == key);
+        }
+    } else {
+        assert(!arr@.contains(key)) by {
+            assert forall|i: int| 0 <= i < arr.len() implies arr[i] != key by {
+                if arr[i] == key {
+                    assert(exists|j: int| 0 <= j < arr.len() && arr[j] == key) by {
+                        assert(0 <= i < arr.len());
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[verifier::exec_allows_no_decreases_clause]
+fn contains(arr: &Vec<i32>, key: i32) -> (result: bool)
+    ensures
+        result == (exists|i: int| 0 <= i < arr.len() && (arr[i] == key)),
+{
+    let mut i = 0;
+    while i < arr.len()
+        invariant
+            forall|m: int| 0 <= m < i ==> (arr[m] != key),
+    {
+        if (arr[i] == key) {
+            return true;
+        }
+        proof {
+            let si = i as int;
+            assert(forall|m: int| 0 <= m < si + 1 ==> arr[m] != key) by {
+                lemma_forall_prefix_extend(arr@, key, si);
+            }
+        }
+        i += 1;
+    }
+    proof {
+        assert forall|k: int| 0 <= k < arr.len() implies arr[k] != key by {
+            assert(0 <= k < i as int) by {
+                assert(k < arr.len());
+            }
+            assert(arr[k] != key);
+        }
+
+        assert(!(exists|k: int| 0 <= k < arr.len() && arr[k] == key)) by {
+            assert forall|k: int| 0 <= k < arr.len() implies arr[k] != key by {
+                assert(0 <= k < i as int);
+                assert(arr[k] != key);
+            }
+        }
+    }
+    false
+}
+
+#[verifier::exec_allows_no_decreases_clause]
+fn shared_elements(list1: &Vec<i32>, list2: &Vec<i32>) -> (shared: Vec<i32>)
+    ensures
+        forall|i: int|
+            0 <= i < shared.len() ==> (list1@.contains(#[trigger] shared[i]) && list2@.contains(
+                #[trigger] shared[i],
+            )),
+        forall|i: int, j: int| 0 <= i < j < shared.len() ==> shared[i] != shared[j],
+{
+    let mut shared = Vec::new();
+    let ghost mut shared_arr_len: int = 0;
+
+    let mut index = 0;
+    while index < list1.len()
+        invariant
+            forall|i: int|
+                0 <= i < shared.len() ==> (list1@.contains(#[trigger] shared[i]) && list2@.contains(
+                    #[trigger] shared[i],
+                )),
+            forall|m: int, n: int| 0 <= m < n < shared.len() ==> shared[m] != shared[n],
+    {
+        if (contains(list2, list1[index]) && !contains(&shared, list1[index])) {
+            // Fill in a block of assertions here to complete the proof
+
+            shared.push(list1[index]);
+
+            // Fill in a block of assertions here to complete the proof
+        }
+        index += 1
+    }
+    shared
+}
+
+}

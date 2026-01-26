@@ -1,0 +1,63 @@
+use vstd::prelude::*;
+fn main() {}
+verus!{
+
+// Complete the lemma function below
+proof fn lemma_mul5_succ(i: int)
+    
+
+#[verifier::exec_allows_no_decreases_clause]
+pub fn myfun(a: &mut Vec<i32>, sum: &mut Vec<i32>, N: i32)
+	requires
+		N > 0,
+		old(a).len() == N,
+		old(sum).len() == 1,
+		N < 1000,
+	ensures
+		sum[0] == 5 * N,
+{
+	let mut i: usize = 0;
+	sum.set(0, 0);
+
+	while (i < N as usize)
+		invariant
+			forall |k:int| 0<= k < i ==> a[k] == 5,
+			a.len() == N,
+	{
+		a.set(i, 5);
+
+		// Fill in a block of assertions here to complete the proof
+
+		i = i + 1;
+	}
+
+	i = 0;
+	while (i < N as usize)
+		// Fill in loop invariants here
+	{
+		// Fill in a block of assertions here to complete the proof
+
+		if (a[i] == 5) {
+			let temp = sum[0] + a[i];
+			// Fill in a block of assertions here to complete the proof
+
+			sum.set(0, temp);
+
+			assert(sum[0] == 5 * (i as int) + 5) by {
+				assert(sum[0] == temp);
+				assert(temp == (5 * (i as int)) + 5);
+			}
+			assert(sum[0] == 5 * (i as int + 1)) by {
+				assert(sum[0] == 5 * (i as int + 1));
+			}
+		} else {
+			let temp = sum[0] * a[i];
+			sum.set(0, temp);
+		}
+
+		i = i + 1;
+	}
+
+	// Fill in a block of assertions here to complete the proof
+}
+}

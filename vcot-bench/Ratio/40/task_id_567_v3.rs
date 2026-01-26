@@ -1,0 +1,104 @@
+use vstd::prelude::*;
+
+fn main() {
+}
+
+verus! {
+
+proof fn lemma_sorted_extend_by_one(arr: &Vec<i32>, index: int)
+    requires
+        arr.len() > 0,
+        0 <= index,
+        index < arr.len() - 1,
+        forall|k: int, l: int| 0 <= k < l <= index ==> arr[k] <= arr[l],
+        arr[index] <= arr[index + 1],
+    ensures
+        forall|k: int, l: int| 0 <= k < l <= index + 1 ==> arr[k] <= arr[l],
+{
+    assert(forall|k: int, l: int| 0 <= k < l <= index + 1 ==> arr[k] <= arr[l]) by {
+        assert forall|k: int, l: int| 0 <= k < l <= index + 1 implies arr[k] <= arr[l] by {
+            if l <= index {
+                assert(arr[k] <= arr[l]);
+            } else {
+                assert(l == index + 1) by {
+                    assert(l <= index + 1);
+                    assert(!(l <= index));
+                    assert(index < l);
+                    assert(l == index + 1);
+                }
+
+                if k == index {
+                    assert(arr[index] <= arr[index + 1]);
+                } else {
+                    assert(k < index) by {
+                        assert(k < l);
+                        assert(l == index + 1);
+                        assert(k != index);
+                        assert(k < index);
+                    }
+                    assert(arr[k] <= arr[index]);
+                    assert(arr[index] <= arr[index + 1]);
+                    assert(arr[k] <= arr[index + 1]) by {
+                        assert(arr[k] <= arr[index]);
+                        assert(arr[index] <= arr[index + 1]);
+                    }
+                }
+            }
+        }
+    }
+}
+
+proof fn lemma_sorted_prefix_to_total_when_finished(arr: &Vec<i32>, index: int)
+    requires
+        arr.len() > 0,
+        index == arr.len() - 1,
+        forall|k: int, l: int| 0 <= k < l <= index ==> arr[k] <= arr[l],
+    ensures
+        forall|i: int, j: int| 0 <= i < j < arr.len() ==> arr[i] <= arr[j],
+{
+    assert(forall|i: int, j: int| 0 <= i < j < arr.len() ==> arr[i] <= arr[j]) by {
+        assert forall|i: int, j: int| 0 <= i < j < arr.len() implies arr[i] <= arr[j] by {
+            assert(j <= index) by {
+                assert(j < arr.len());
+                assert(index == arr.len() - 1);
+                assert(j <= arr.len() - 1);
+            }
+            assert(arr[i] <= arr[j]);
+        }
+    }
+}
+
+#[verifier::exec_allows_no_decreases_clause]
+fn is_sorted(arr: &Vec<i32>) -> (is_sorted: bool)
+    requires
+        arr.len() > 0,
+    ensures
+        is_sorted == (forall|i: int, j: int| 0 <= i < j < arr.len() ==> (arr[i] <= arr[j])),
+{
+    let mut index = 0;
+    while index < arr.len() - 1
+        invariant
+            0 <= index <= arr.len() - 1,
+            forall|k: int, l: int| 0 <= k < l <= index ==> arr[k] <= arr[l],
+    {
+        if arr[index] > arr[index + 1] {
+            // Fill in a block of assertions here to complete the proof
+            return false;
+        }
+
+        // Fill in a block of assertions here to complete the proof
+
+        index += 1;
+
+        assert(0 <= index <= arr.len() - 1) by {
+            assert(0 <= index);
+            assert(index <= arr.len() - 1);
+        }
+    }
+
+    // Fill in a block of assertions here to complete the proof
+
+    true
+}
+
+} // verus!

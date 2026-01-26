@@ -1,0 +1,149 @@
+use vstd::prelude::*;
+
+fn main() {
+}
+
+verus! {
+
+spec fn is_lower_case(c: u8) -> bool {
+    c >= 97 && c <= 122
+}
+
+spec fn shift_minus_32_spec(c: u8) -> u8 {
+    (c - 32) as u8
+}
+
+proof fn lemma_forall_extend_one(
+    str1: &[u8],
+    upper_case: Seq<u8>,
+    index: int,
+    new_val: u8,
+)
+    requires
+        0 <= index,
+        index < str1@.len(),
+        upper_case.len() == index,
+        forall|i: int|
+            0 <= i < index ==> (upper_case[i] == (if is_lower_case(#[trigger] str1[i]) {
+                shift_minus_32_spec(str1[i])
+            } else {
+                str1[i]
+            })),
+        new_val == (if is_lower_case(str1[index]) {
+            shift_minus_32_spec(str1[index])
+        } else {
+            str1[index]
+        }),
+    ensures
+        forall|i: int|
+            0 <= i < index + 1 ==> (upper_case.push(new_val)[i] == (if is_lower_case(#[trigger] str1[i]) {
+                shift_minus_32_spec(str1[i])
+            } else {
+                str1[i]
+            })),
+{
+    assert(forall|i: int|
+        0 <= i < index + 1 ==> (upper_case.push(new_val)[i] == (if is_lower_case(#[trigger] str1[i]) {
+            shift_minus_32_spec(str1[i])
+        } else {
+            str1[i]
+        }))) by {
+        assert forall|i: int|
+            0 <= i < index + 1 implies (upper_case.push(new_val)[i] == (if is_lower_case(#[trigger] str1[i]) {
+                shift_minus_32_spec(str1[i])
+            } else {
+                str1[i]
+            })) by
+        {
+            if i < index {
+                assert(upper_case.push(new_val)[i] == upper_case[i]);
+                assert(upper_case[i] == (if is_lower_case(#[trigger] str1[i]) {
+                    shift_minus_32_spec(str1[i])
+                } else {
+                    str1[i]
+                }));
+            } else {
+                assert(i == index);
+                assert(upper_case.push(new_val)[i] == new_val);
+                assert(new_val == (if is_lower_case(str1[index]) {
+                    shift_minus_32_spec(str1[index])
+                } else {
+                    str1[index]
+                }));
+            }
+        }
+    };
+}
+
+#[verifier::exec_allows_no_decreases_clause]
+fn to_uppercase(str1: &[u8]) -> (result: Vec<u8>)
+    ensures
+        str1@.len() == result@.len(),
+        forall|i: int|
+            0 <= i < str1.len() ==> (result[i] == (if is_lower_case(#[trigger] str1[i]) {
+                shift_minus_32_spec(str1[i])
+            } else {
+                str1[i]
+            })),
+{
+    let mut upper_case: Vec<u8> = Vec::with_capacity(str1.len());
+    let mut index = 0;
+    while index < str1.len()
+        invariant
+            0 <= index <= str1.len(),
+            upper_case.len() == index,
+            forall|i: int|
+                0 <= i < index ==> (upper_case[i] == (if is_lower_case(#[trigger] str1[i]) {
+                    shift_minus_32_spec(str1[i])
+                } else {
+                    str1[i]
+                })),
+    {
+        let c = str1[index];
+
+        if (str1[index] >= 97 && str1[index] <= 122) {
+            upper_case.push((str1[index] - 32) as u8);
+        } else {
+            upper_case.push(str1[index]);
+        }
+
+        assert(upper_case[index as int] == (if is_lower_case(str1[index as int]) {
+            shift_minus_32_spec(str1[index as int])
+        } else {
+            str1[index as int]
+        }));
+
+        proof {
+            lemma_forall_extend_one(
+                str1,
+                upper_case@.drop_last(),
+                index as int,
+                upper_case[index as int],
+            );
+        }
+
+        index += 1;
+
+        assert(upper_case.len() == index);
+
+        assert(forall|i: int|
+            0 <= i < index ==> (upper_case[i] == (if is_lower_case(#[trigger] str1[i]) {
+                shift_minus_32_spec(str1[i])
+            } else {
+                str1[i]
+            })));
+    }
+
+    assert(index == str1.len());
+    assert(upper_case.len() == str1.len());
+
+    assert(forall|i: int|
+        0 <= i < str1.len() ==> upper_case[i] == (if is_lower_case(#[trigger] str1[i]) {
+            shift_minus_32_spec(str1[i])
+        } else {
+            str1[i]
+        }));
+    upper_case
+}
+
+} // verus!

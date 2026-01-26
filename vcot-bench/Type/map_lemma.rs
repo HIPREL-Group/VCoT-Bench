@@ -1,0 +1,96 @@
+use vstd::prelude::*;
+fn main() {}
+verus!{
+
+// Complete the lemma function below
+proof fn lemma_i32_add_4_no_overflow(v: i32)
+   
+
+// Complete the lemma function below
+proof fn lemma_forall_extend_by_one<T>(
+    s: Seq<T>,
+    i: int,
+    p: spec_fn(int) -> bool,
+)
+   
+
+// Complete the lemma function below
+proof fn lemma_shift_lower_segment<T>(
+    i: int,
+    xlen: int,
+    p: spec_fn(int) -> bool,
+)
+   
+
+#[verifier::exec_allows_no_decreases_clause]
+pub fn myfun2(x: &mut Vec<i32>) 
+requires 
+    forall |k:int| 0 <= k < old(x).len() ==> old(x)[k] <= 0x7FFF_FFFB,
+ensures 
+    x@.len() == old(x)@.len(),
+    forall |k:int| 0 <= k < x.len() ==> #[trigger] x@[k] == old(x)@[k] + 4,
+{
+    let mut i: usize = 0;
+    let xlen: usize = x.len();
+
+    while (i < xlen) 
+        invariant 
+            xlen == x.len(),
+            0 <= i <= xlen,
+            forall |k:int| 0 <= k < i ==> #[trigger] x[k] == old(x)[k] + 4,
+            forall |k:int| i <= k < xlen ==> x[k] == old(x)[k],
+            forall |k:int| 0 <= k < xlen ==> old(x)[k] <= 0x7FFF_FFFB,
+    { 
+        let temp = x[i];
+
+        assert(temp == old(x)[(i as int)]) by {
+            assert((i as int) < (xlen as int));
+        }
+
+        assert(old(x)[(i as int)] <= 0x7FFF_FFFB) by {
+            assert((i as int) < (xlen as int));
+        }
+
+        proof {
+            lemma_i32_add_4_no_overflow(temp);
+        }
+
+        x.set(i, temp + 4);
+
+        assert(x[(i as int)] == old(x)[(i as int)] + 4) by {
+            assert(x[(i as int)] == temp + 4);
+            assert(temp == old(x)[(i as int)]);
+        }
+
+        assert(forall |k:int| 0 <= k < i + 1 ==> #[trigger] x[k] == old(x)[k] + 4) by {
+            let p = |k:int| x[k] == old(x)[k] + 4;
+            assert(forall |k:int| 0 <= k < i ==> #[trigger] p(k));
+            assert(p((i as int))) by {
+                assert(x[(i as int)] == old(x)[(i as int)] + 4);
+            }
+            lemma_forall_extend_by_one(x@, (i as int), p);
+        }
+
+        assert(forall |k:int| i + 1 <= k < xlen ==> x[k] == old(x)[k]) by {
+            let p = |k:int| if k == (i as int) { true } else { x[k] == old(x)[k] };
+            assert(forall |k:int| (i as int) <= k < xlen ==> #[trigger] p(k));
+            lemma_shift_lower_segment::<i32>((i as int), (xlen as int), p);
+        }
+
+        i = i + 1;
+    }  
+
+    assert(x@.len() == old(x)@.len()) by {
+        assert(x.len() == xlen);
+        assert(old(x).len() == xlen);
+    }
+
+    assert(forall |k:int| 0 <= k < x.len() ==> #[trigger] x@[k] == old(x)@[k] + 4) by {
+        assert(forall |k:int| 0 <= k < i ==> #[trigger] x[k] == old(x)[k] + 4);
+        assert(i == xlen);
+        assert forall |k:int| 0 <= k < x.len() implies #[trigger] x@[k] == old(x)@[k] + 4 by {
+            assert(k < (i as int));
+        }
+    }
+}
+}

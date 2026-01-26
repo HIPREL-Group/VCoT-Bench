@@ -1,0 +1,108 @@
+use vstd::prelude::*;
+
+fn main() {}
+
+verus! {
+
+// Complete the lemma function below
+proof fn lemma_u32_sum_lt_256_implies_no_overflow(a: u32, b: u32)
+   
+
+proof fn lemma_u32_add_lt_256_implies_not_overflowing_sum_is_int_sum(a: u32, b: u32)
+    requires
+        (a as int) + (b as int) < 256,
+    ensures
+        ((a + b) as int) == (a as int) + (b as int),
+{
+    lemma_u32_sum_lt_256_implies_no_overflow(a, b);
+    assert(((a + b) as int) == (a as int) + (b as int));
+}
+
+// Complete the lemma function below
+proof fn lemma_forall_split_row_prefix(
+    nums: &Vec<u32>,
+    target: u32,
+    i: usize,
+    j: usize,
+)
+   
+
+// Complete the lemma function below
+proof fn lemma_forall_extend_row_prefix(
+    nums: &Vec<u32>,
+    target: u32,
+    i: usize,
+    j: usize,
+)
+   
+
+// Complete the lemma function below
+proof fn lemma_forall_extend_matrix_prefix(
+    nums: &Vec<u32>,
+    target: u32,
+    i: usize,
+    n: usize,
+)
+   
+
+#[verifier::exec_allows_no_decreases_clause]
+fn two_sum(nums: &Vec<u32>, target: u32) -> (r: (usize, usize))
+    requires
+        nums.len() > 1,
+        forall|ii: int, jj: int|
+            ((0 <= ii && ii < nums.len() && ii < jj && jj < nums.len())) ==> nums[ii] + nums[jj]
+                < 256,
+        exists|i: int, j: int| (0 <= i && i < j && j < nums.len()) && nums[i] + nums[j] == target,
+    ensures
+        (0 <= r.0 && r.0 < r.1 && r.1 < nums.len()) && nums[(r.0 as int)] + nums[(r.1 as int)]
+            == target,
+        forall|ii: int, jj: int|
+            ((0 <= ii && ii < r.0 && ii < jj && jj < nums.len()) || (ii == r.0 && ii < jj && jj
+                < r.1)) ==> nums[ii] + nums[jj] != target,
+{
+    let n = nums.len();
+    let mut i = 0;
+    let mut j = 1;
+
+    // Fill in a block of assertions here to complete the proof
+
+    while i < n - 1
+        // Fill in loop invariants here
+    {
+        j = i + 1;
+
+        while j < n
+            invariant
+                n == nums@.len(),
+                0 <= i && i < j && j <= n,
+                forall|ii: int, jj: int|
+                    ((0 <= ii && ii < nums.len() && ii < jj && jj < nums.len())) ==> nums[ii]
+                        + nums[jj] < 256,
+                forall|ii: int, jj: int|
+                    (0 <= ii && ii < i && ii < jj && jj < n) ==> nums[ii] + nums[jj] != target,
+                forall|jj: int| (i < jj && jj < j) ==> nums[(i as int)] + nums[jj] != target,
+        {
+            // Fill in a block of assertions here to complete the proof
+
+            if nums[i] + nums[j] == target {
+                // Fill in a block of assertions here to complete the proof
+                return (i, j);
+            }
+
+            // Fill in a block of assertions here to complete the proof
+
+            j += 1;
+        }
+
+        // Fill in a block of assertions here to complete the proof
+
+        i += 1;
+
+        proof {
+            assert(0 <= i && i < j && j <= n);
+        }
+    }
+    (i, j)
+}
+
+} // verus!

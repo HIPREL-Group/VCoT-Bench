@@ -1,0 +1,104 @@
+use vstd::prelude::*;
+
+fn main() {
+}
+
+verus! {
+
+// Complete the lemma function below
+proof fn lemma_vec_push<T>(vec: Seq<T>, i: T, l: usize)
+   
+
+#[verifier::exec_allows_no_decreases_clause]
+fn contains(arr: &Vec<i32>, key: i32) -> (result: bool)
+    ensures
+        result == (exists|i: int| 0 <= i < arr.len() && (arr[i] == key)),
+{
+    let mut index = 0;
+
+    while index < arr.len()
+        // Fill in loop invariants here
+    {
+        if (arr[index] == key) {
+            // Fill in a block of assertions here to complete the proof;
+            return true;
+        }
+
+        // Fill in a block of assertions here to complete the proof;
+
+        index += 1;
+
+        // Fill in a block of assertions here to complete the proof;
+    }
+
+    // Fill in a block of assertions here to complete the proof;
+
+    false
+}
+
+// Complete the lemma function below
+proof fn lemma_seq_contains_witness<T>(s: Seq<T>, x: T, i: int)
+   
+
+proof fn lemma_seq_not_contains_implies_index_ne<T>(s: Seq<T>, x: T, i: int)
+    requires
+        !s.contains(x),
+        0 <= i < s.len(),
+    ensures
+        s.index(i) != x,
+{
+    if s.index(i) == x {
+        assert(s.contains(x)) by {
+            lemma_seq_contains_witness(s, x, i);
+        };
+        assert(false);
+    }
+}
+
+#[verifier::exec_allows_no_decreases_clause]
+fn find_dissimilar(arr1: &Vec<i32>, arr2: &Vec<i32>) -> (result: Vec<i32>)
+    ensures
+        forall|i: int|
+            0 <= i < arr1.len() ==> (!arr2@.contains(#[trigger] arr1[i]) ==> result@.contains(
+                arr1[i],
+            )),
+        forall|i: int|
+            0 <= i < arr2.len() ==> (!arr1@.contains(#[trigger] arr2[i]) ==> result@.contains(
+                arr2[i],
+            )),
+        forall|i: int, j: int|
+            0 <= i < j < result.len() ==> #[trigger] result[i] != #[trigger] result[j],
+{
+    let mut result = Vec::new();
+    let ghost mut output_len: int = 0;
+
+    let mut index = 0;
+    while index < arr1.len()
+        // Fill in loop invariants here
+    {
+        if (!contains(arr2, arr1[index]) && !contains(&result, arr1[index])) {
+            // Fill in a block of assertions here to complete the proof
+            result.push(arr1[index]);
+
+            // Fill in a block of assertions here to complete the proof
+        }
+        index += 1;
+    }
+    let mut index = 0;
+    while index < arr2.len()
+        // Fill in loop invariants here
+    {
+        if (!contains(arr1, arr2[index]) && !contains(&result, arr2[index])) {
+            // Fill in a block of assertions here to complete the proof
+            result.push(arr2[index]);
+
+            // Fill in a block of assertions here to complete the proof
+        }
+        index += 1;
+    }
+    // Fill in a block of assertions here to complete the proof;
+
+    result
+}
+
+} // verus!

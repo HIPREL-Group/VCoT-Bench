@@ -1,0 +1,93 @@
+use vstd::prelude::*;
+fn main() {}
+verus!{
+
+// Complete the lemma function below
+proof fn lemma_extend_prefix_set_to_one_a(a: &Vec<i32>, i: usize)
+   
+
+proof fn lemma_extend_prefix_set_to_one_b(b: &Vec<i32>, i: usize)
+    requires
+        i < b.len(),
+        forall |k:int| 0 <= k < i ==> b[k] == 1,
+        b[(i as int)] == 1,
+    ensures
+        forall |k:int| 0 <= k < i + 1 ==> b[k] == 1,
+{
+    assert forall |k:int| 0 <= k < i + 1 implies b[k] == 1 by {
+        if 0 <= k < i {
+            assert(b[k] == 1);
+        } else {
+            assert(k == i) by {
+                assert(k < i + 1);
+                assert(!(k < i));
+                assert(k >= i);
+            }
+            assert(b[k] == b[(i as int)]);
+            assert(b[(i as int)] == 1);
+        }
+    }
+}
+
+#[verifier::exec_allows_no_decreases_clause]
+pub fn myfun(a: &mut Vec<i32>, b: &mut Vec<i32>, sum: &mut Vec<i32>, N: i32)
+    requires
+        N > 0,
+        old(a).len() == N,
+        old(b).len() == N,
+        old(sum).len() == 1,
+        N < 1000,
+    ensures
+        sum[0] <= 2 * N,
+{
+    sum.set(0, 0);
+
+    let mut i: usize = 0;
+    while (i < (N as usize))
+        // Fill in loop invariants here
+    {
+        a.set(i, 1);
+
+        // Fill in a block of assertions here to complete the proof;
+
+        i = i + 1;
+    }
+
+    i = 0;
+    while (i < (N as usize))
+        // Fill in loop invariants here
+    {
+        let temp = sum[0] + a[i];
+        sum.set(0, temp);
+
+        // Fill in a block of assertions here to complete the proof;
+
+        i = i + 1;
+    }
+
+    i = 0;
+    while (i < (N as usize))
+        // Fill in loop invariants here
+    {
+        b.set(i, 1);
+
+        // Fill in a block of assertions here to complete the proof;
+
+        i = i + 1;
+    }
+
+    i = 0;
+    while (i < (N as usize))
+        // Fill in loop invariants here
+    {
+        let temp = sum[0] + b[i];
+        sum.set(0, temp);
+
+        // Fill in a block of assertions here to complete the proof;
+
+        i = i + 1;
+    }
+
+    // Fill in a block of assertions here to complete the proof;
+}
+}

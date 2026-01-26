@@ -1,0 +1,80 @@
+use vstd::prelude::*;
+
+fn main() {
+}
+
+verus! {
+
+// Complete the lemma function below
+proof fn lemma_take0_filter_empty(arr: Seq<u32>)
+    
+
+// Complete the lemma function below
+proof fn lemma_take_drop_last(arr: Seq<u32>, i: int)
+   
+
+// Complete the lemma function below
+proof fn lemma_take_len_full(arr: Seq<u32>)
+    
+
+// Complete the lemma function below
+proof fn lemma_take_succ_push(arr: Seq<u32>, i: int)
+   
+
+#[verifier::exec_allows_no_decreases_clause]
+fn remove_odds(arr: &Vec<u32>) -> (even_list: Vec<u32>)
+    ensures
+        even_list@ == arr@.filter(|x: u32| x % 2 == 0),
+{
+    let mut even_list: Vec<u32> = Vec::new();
+    let input_len = arr.len();
+
+    proof { lemma_take0_filter_empty(arr@); }
+
+    let mut index = 0;
+    while index < arr.len()
+        invariant
+            0 <= index <= arr.len(),
+            even_list@ == arr@.take((index as int)).filter(|x: u32| x % 2 == 0),
+    {
+        if (arr[index] % 2 == 0) {
+            even_list.push(arr[index]);
+        }
+
+        assert(arr@.take(((index + 1) as int)).drop_last() == arr@.take((index as int))) by {
+            lemma_take_drop_last(arr@, (index as int));
+        };
+
+        proof { reveal(Seq::filter); }
+
+        if arr[index] % 2 == 0 {
+            assert(arr@.take(((index + 1) as int))
+                == arr@.take((index as int)).push(arr[(index as int)])) by {
+                lemma_take_succ_push(arr@, (index as int));
+            }
+            assert(
+                arr@.take(((index + 1) as int)).filter(|x: u32| x % 2 == 0)
+                == arr@.take((index as int)).filter(|x: u32| x % 2 == 0).push(arr[(index as int)])
+            ) by {
+                reveal(Seq::filter);
+            }
+        } else {
+            assert(
+                arr@.take(((index + 1) as int)).filter(|x: u32| x % 2 == 0)
+                == arr@.take((index as int)).filter(|x: u32| x % 2 == 0)
+            ) by {
+                reveal(Seq::filter);
+            }
+        }
+
+        index += 1;
+    }
+
+    assert(arr@ == arr@.take((input_len as int))) by {
+        lemma_take_len_full(arr@);
+    };
+
+    even_list
+}
+
+}
