@@ -1,4 +1,4 @@
 {
-    "verus_path": "/p/llm4verus/CodeVerus/verus/verus", 
-    "result_dir": "/p/llm4verus/VCoT-Bench/vcot-lift/result/test"
+    "verus_path": "<path to verus executable file>", 
+    "result_dir": "path to the result directory"
 }
