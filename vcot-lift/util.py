@@ -31,65 +31,6 @@ def verify(file_path: str):
         return (False, result.stderr)
 
 
-def code_change_is_safe(
-    origin,
-    changed,
-    verus_path,
-    logger,
-    target_mode=True,
-    util_path="./utils",
-    inter=False,
-    debug=True,
-):
-
-    orig_f = tempfile.NamedTemporaryFile(
-        mode="w", delete=False, prefix="llm4v_orig", suffix=".rs"
-    )
-    orig_f.write(origin)
-    orig_f.close()
-
-    changed_f = tempfile.NamedTemporaryFile(
-        mode="w", delete=False, prefix="llm4v_changed", suffix=".rs"
-    )
-    changed_f.write(changed)
-    changed_f.close()
-
-    cargopath = util_path + "/lynette/source/Cargo.toml"
-
-    opts = []
-    if inter:
-        opts = ["--asserts-anno"]
-    elif target_mode:
-        opts = ["-t"]
-
-    verus_compare_cmd = (
-        ["cargo", "run", "--manifest-path", cargopath, "--", "compare"]
-        + opts
-        + [orig_f.name, changed_f.name]
-    )
-
-    m = subprocess.run(verus_compare_cmd, capture_output=True, text=True)
-    # os.unlink(orig_f.name)
-    # os.unlink(changed_f.name)
-
-    if m.returncode == 0:
-        return True
-    elif m.returncode == 1:
-        err_m = m.stdout.strip()
-        if err_m == "Files are different":
-            return False
-        else:
-            logger.error(f"Error in comparing code changes: {err_m}")
-            return False
-    else:
-        err_m = m.stderr.strip()
-        if "unwrap()" in err_m:
-            logger.error(f"Error in comparing code changes: {err_m}")
-            return False
-
-    return None
-
-
 def gain_proof(file_path: str):
 
     def convert_formula():
@@ -240,20 +181,3 @@ def rule_selector_test(proof_rules, proof_content):
             res_list.append("\n".join(proof_context))
      
     return res_list
-
-
-if __name__ == "__main__":
-    gain_proof("temp.rs")
-    pass
-    # path = "benchmarks"
-    # ans = 0
-    # for root, dirs, files in os.walk(path):
-    #     for file in files:
-    #         if file.endswith(".rs"):
-    #             file_path = os.path.join(root, file)
-    #             ret, num = gain_proof(file_path)
-    #             for i  in range(num):
-    #                 with open(f".verus-log/z3_proof{i}.smt2", "r") as fp:
-    #                     content = fp.read()
-    #                     ans = max(ans, len(content.split("\n")))
-    # print(ans)

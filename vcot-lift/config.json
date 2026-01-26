@@ -1,4 +1,4 @@
 {
     "verus_path": "<path to verus executable file>", 
-    "result_dir": "path to the result directory"
+    "result_dir": "<path to the result directory>"
 }
