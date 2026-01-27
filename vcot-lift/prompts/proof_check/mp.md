@@ -9,7 +9,7 @@ The `mp` (Modus Ponens) rule represents the fundamental engine of sequential ded
 
 Your task is to analyze the Z3 proof and **examine** whether the proofs in the provided Verus program fully cover the internal reasoning steps shown in the Z3 proof. 
 
-### Abstraction Barrier
+### Abstraction Filter
 
 You must NOT transform Z3 proof steps that are **Trivial** or **Redundant**. If the Z3 proof contains no reasoning beyond these categories, the Verus program must be considered complete. A Z3 proof step must be ignored if it falls into the following categories:
 
