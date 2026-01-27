@@ -1,6 +1,6 @@
 **Structure for VCoT-Bench**:
 
-- **org**: the ground-truth, generated from [Verus-Bench](https://github.com/microsoft/verus-proof-synthesis).
+- **org**: the ground-truth, generated from [Verus-Bench](https://github.com/microsoft/verus-proof-synthesis/tree/main/benchmarks/Verus-Bench).
 
 - **ratio**: Sub-dataset for ratio dimension. Each subdirectory corresponds to a specific removal rate (e.g., “10” denotes a 10% removal rate).
 
