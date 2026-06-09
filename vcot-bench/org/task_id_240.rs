@@ -87,6 +87,11 @@ fn replace_last_element(first: &Vec<i32>, second: &Vec<i32>) -> (replaced_list: 
     let mut index = 0;
 
     proof {
+        let empty_s: Seq<i32> = Seq::empty();
+        if first.len() > 0 {
+            lemma_seq_add_append_one(empty_s, empty_s, first[0]);
+        }
+        assert(Seq::empty().add(Seq::empty().push(first[0])) =~= Seq::empty().push(first[0]));
         lemma_subrange_add_whole(first@, first_end as int);
     }
 

@@ -1,6 +1,3 @@
-# Ignore Mac system files
-vcot-lift/.DS_Store
-
 vcot-lift/__pycache__/
 vcot-lift/.verus-log/
 vcot-lift/result/

@@ -1,11 +1,5 @@
 # VCoT-Bench: Evaluating via Verification Chain of Thought
 
-**Table of Contents**:
-
-- [Overview](#overview)
-
-- [VCoT-Lift Setup](#vcot-lift-setup)
-
 ## Overview
 
 **VCoT-Bench** is a benchmark designed to evaluate the formal verification capabilities of Large Language Models (LLMs). It is constructed using **VCoT-Lift**, which exposes internal verification reasoning by lifting low-level Z3 proofs into Verus-level verification steps.
@@ -22,7 +16,7 @@
 
 ### VCoT-Lift
 
-**VCoT-Lift** is a multi-stage framework to lift the low-level logical reasoning embedded in Z3 proofs into comprehensive Verus-level verification steps. 
+**VCoT-Lift** is an LLM-based framework to lift the low-level Z3 proofs into explicit, human-readable Verus verification steps.
 
 ## VCoT-Lift Setup
 
