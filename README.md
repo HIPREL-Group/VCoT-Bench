@@ -1,5 +1,9 @@
 # VCoT-Bench: Evaluating via Verification Chain of Thought
 
+**Accepted at ICML 2026**
+
+📄 Paper: [Can LLMs Reason Like Automated Theorem Provers for Rust Verification? VCoT-Bench: Evaluating via Verification Chain of Thought](https://arxiv.org/abs/2603.18334) — Zichen Xie, Wenxi Wang
+
 ## Overview
 
 **VCoT-Bench** is a benchmark designed to evaluate the formal verification capabilities of Large Language Models (LLMs). It is constructed using **VCoT-Lift**, which exposes internal verification reasoning by lifting low-level Z3 proofs into Verus-level verification steps.
@@ -74,3 +78,16 @@ python main.py --file examples/task_id_240.rs --id task_id_240
 **Output:**
 
 All intermidiate outputs and final result will be store under `<result_path>/<id>`. The final transformed Verus program with verification steps will be shown in `verus_vs.rs`.
+
+## Citation
+
+If you find this work useful, please cite:
+
+```bibtex
+@article{xie2026can,
+  title={Can LLMs Reason Like Automated Theorem Provers for Rust Verification? VCoT-Bench: Evaluating via Verification Chain of Thought},
+  author={Xie, Zichen and Wang, Wenxi},
+  journal={arXiv preprint arXiv:2603.18334},
+  year={2026}
+}
+```
