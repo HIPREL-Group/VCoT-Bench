@@ -2,7 +2,7 @@
 
 **Accepted at ICML 2026**
 
-📄 Paper: [Can LLMs Reason Like Automated Theorem Provers for Rust Verification? VCoT-Bench: Evaluating via Verification Chain of Thought](https://arxiv.org/abs/2603.18334) — Zichen Xie, Wenxi Wang
+📄 Paper: [Can LLMs Reason Like Automated Theorem Provers for Rust Verification? VCoT-Bench: Evaluating via Verification Chain of Thought](https://arxiv.org/abs/2603.18334) 
 
 ## Overview
 
