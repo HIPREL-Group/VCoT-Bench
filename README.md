@@ -91,3 +91,7 @@ If you find this work useful, please cite:
   year={2026}
 }
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
