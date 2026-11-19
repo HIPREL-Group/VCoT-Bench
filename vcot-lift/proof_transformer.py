@@ -4,10 +4,11 @@ from proof_checker import LemmaChecker, MpChecker, QuantChecker, ThLemmaChecker,
 
 
 class Transformer:
-    def __init__(self, verus_vs_path, max_iter, model, logger):
+    def __init__(self, verus_vs_path, max_iter, model, check_model, logger):
         self.verus_vs_path = verus_vs_path
         self.max_iter = max_iter
-        self.model = model
+        self.model = model  # used for proof transformation
+        self.check_model = check_model  # used by the proof checkers
         self.logger = logger
         
     
@@ -15,7 +16,7 @@ class Transformer:
         result_proof_check_path = Path(result_path) / f"proof_check"
         
         # Checkers
-        lemma_checker = LemmaChecker(model=self.model, 
+        lemma_checker = LemmaChecker(model=self.check_model, 
                                      verus_path=self.verus_vs_path,
                                      max_iter=1, 
                                      result_path=result_proof_check_path, 
@@ -23,7 +24,7 @@ class Transformer:
         if lemma_checker.check(z3_proof) == False:
             return False
 
-        mp_checker = MpChecker(model=self.model, 
+        mp_checker = MpChecker(model=self.check_model, 
                                verus_path=self.verus_vs_path,
                                max_iter=1, 
                                result_path=result_proof_check_path, 
@@ -31,7 +32,7 @@ class Transformer:
         if mp_checker.check(z3_proof) == False:
             return False
 
-        quant_checker = QuantChecker(model=self.model, 
+        quant_checker = QuantChecker(model=self.check_model, 
                                      verus_path=self.verus_vs_path,
                                      max_iter=1, 
                                      result_path=result_proof_check_path, 
@@ -39,7 +40,7 @@ class Transformer:
         if quant_checker.check(z3_proof) == False:
             return False
 
-        th_lemma_checker = ThLemmaChecker(model=self.model, 
+        th_lemma_checker = ThLemmaChecker(model=self.check_model, 
                                           verus_path=self.verus_vs_path,
                                           max_iter=1, 
                                           result_path=result_proof_check_path, 
@@ -47,7 +48,7 @@ class Transformer:
         if th_lemma_checker.check(z3_proof) == False:
             return False
 
-        u_resolution_checker = UResolutionChecker(model=self.model, 
+        u_resolution_checker = UResolutionChecker(model=self.check_model, 
                                                   verus_path=self.verus_vs_path,
                                                   max_iter=1, 
                                                   result_path=result_proof_check_path, 
